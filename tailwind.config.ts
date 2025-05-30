@@ -63,14 +63,11 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				'forest-green': '#064e3b',
-				'electric-purple': '#8b5cf6',
-				'bright-coral': '#ff6b6b',
-				'snow-white': '#ffffff',
-				midnight: '#0f172a',
-				emerald: '#10b981',
-				pearl: '#f8fafc',
-				rosegold: '#f59e0b'
+				'rich-burgundy': '#991b1b',
+				'warm-amber': '#f59e0b',
+				'soft-lavender': '#e0e7ff',
+				'charcoal-slate': '#374151',
+				'pearl-white': '#f9fafb'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -94,77 +91,44 @@ export default {
 						height: '0'
 					}
 				},
-				'slide-in': {
-					'0%': { transform: 'translateX(-100%)', opacity: '0' },
-					'100%': { transform: 'translateX(0)', opacity: '1' }
-				},
-				'slide-in-up': {
-					'0%': { transform: 'translateY(100%)', opacity: '0' },
-					'100%': { transform: 'translateY(0)', opacity: '1' }
-				},
-				'fade-in': {
+				'fade-in-up': {
 					'0%': { opacity: '0', transform: 'translateY(20px)' },
 					'100%': { opacity: '1', transform: 'translateY(0)' }
 				},
-				'fade-in-scale': {
-					'0%': { opacity: '0', transform: 'scale(0.9)' },
+				'scale-in': {
+					'0%': { opacity: '0', transform: 'scale(0.95)' },
 					'100%': { opacity: '1', transform: 'scale(1)' }
 				},
-				'scale-in': {
-					'0%': { transform: 'scale(0.95)', opacity: '0' },
-					'100%': { transform: 'scale(1)', opacity: '1' }
+				'slide-in-right': {
+					'0%': { opacity: '0', transform: 'translateX(30px)' },
+					'100%': { opacity: '1', transform: 'translateX(0)' }
 				},
-				'flip': {
-					'0%': { transform: 'rotateY(0)' },
-					'50%': { transform: 'rotateY(180deg)' },
-					'100%': { transform: 'rotateY(360deg)' }
-				},
-				'float': {
+				'gentle-float': {
 					'0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-					'33%': { transform: 'translateY(-10px) rotate(1deg)' },
-					'66%': { transform: 'translateY(5px) rotate(-1deg)' }
+					'33%': { transform: 'translateY(-8px) rotate(1deg)' },
+					'66%': { transform: 'translateY(4px) rotate(-1deg)' }
 				},
-				'pulse-glow': {
-					'0%, 100%': { boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)' },
-					'50%': { boxShadow: '0 0 40px rgba(139, 92, 246, 0.6)' }
+				'smooth-pulse': {
+					'0%, 100%': { opacity: '1', transform: 'scale(1)' },
+					'50%': { opacity: '0.8', transform: 'scale(1.05)' }
 				},
-				'gradient-shift': {
-					'0%': { backgroundPosition: '0% 50%' },
-					'50%': { backgroundPosition: '100% 50%' },
-					'100%': { backgroundPosition: '0% 50%' }
-				},
-				'shimmer': {
+				'elegant-shimmer': {
 					'0%': { transform: 'translateX(-100%)' },
 					'100%': { transform: 'translateX(100%)' }
-				},
-				'bounce-gentle': {
-					'0%, 100%': { transform: 'translateY(0)' },
-					'50%': { transform: 'translateY(-5px)' }
-				},
-				'wiggle': {
-					'0%, 100%': { transform: 'rotate(0deg)' },
-					'25%': { transform: 'rotate(1deg)' },
-					'75%': { transform: 'rotate(-1deg)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'slide-in': 'slide-in 0.5s ease-out',
-				'slide-in-up': 'slide-in-up 0.5s ease-out',
-				'fade-in': 'fade-in 0.6s ease-out',
-				'fade-in-scale': 'fade-in-scale 0.4s ease-out',
-				'scale-in': 'scale-in 0.3s ease-out',
-				'flip': 'flip 0.8s ease-in-out',
-				'float': 'float 6s ease-in-out infinite',
-				'pulse-glow': 'pulse-glow 2s infinite',
-				'gradient-shift': 'gradient-shift 3s ease infinite',
-				'shimmer': 'shimmer 2s infinite',
-				'bounce-gentle': 'bounce-gentle 2s infinite',
-				'wiggle': 'wiggle 0.5s ease-in-out'
+				'fade-in-up': 'fade-in-up 0.6s ease-out',
+				'scale-in': 'scale-in 0.4s ease-out',
+				'slide-in-right': 'slide-in-right 0.5s ease-out',
+				'gentle-float': 'gentle-float 6s ease-in-out infinite',
+				'smooth-pulse': 'smooth-pulse 3s ease-in-out infinite',
+				'elegant-shimmer': 'elegant-shimmer 2s infinite'
 			},
-			backgroundSize: {
-				'400%': '400% 400%'
+			scale: {
+				'102': '1.02'
 			}
 		}
 	},

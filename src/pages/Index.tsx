@@ -12,16 +12,16 @@ const Index = () => {
   const getPageTitle = () => {
     switch (activeTab) {
       case 'dashboard': return 'Dashboard Overview';
-      case 'jobs': return 'Job Postings';
-      case 'candidates': return 'Candidate Management';
-      case 'interviews': return 'Interview Scheduling';
+      case 'jobs': return 'Job Management';
+      case 'candidates': return 'Candidate Pipeline';
+      case 'interviews': return 'Interview Coordination';
       case 'resume-matcher': return 'Resume Matcher AI';
-      case 'interview-summary': return 'Interview Summary Generator';
-      case 'chat-summarizer': return 'Chat Summarizer';
-      case 'bias-detector': return 'Bias Detector';
-      case 'analytics': return 'Analytics & Reports';
-      case 'settings': return 'Settings';
-      default: return 'ATS Dashboard';
+      case 'interview-summary': return 'Interview Intelligence';
+      case 'chat-summarizer': return 'Chat Analytics';
+      case 'bias-detector': return 'Bias Detection';
+      case 'analytics': return 'Advanced Analytics';
+      case 'settings': return 'System Settings';
+      default: return 'ElegantATS Platform';
     }
   };
 
@@ -35,64 +35,85 @@ const Index = () => {
         return <ResumeMatcherAI />;
       case 'candidates':
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-              <h3 className="text-xl font-semibold text-midnight mb-4">Candidate Management</h3>
-              <p className="text-gray-600">Advanced candidate tracking and management features coming soon...</p>
+          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
+            <div className="elegant-card rounded-3xl p-12 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-rich-burgundy to-warm-amber rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">👥</span>
+              </div>
+              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Candidate Management</h3>
+              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Advanced candidate tracking and pipeline management features coming soon...</p>
             </div>
           </div>
         );
       case 'interviews':
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-              <h3 className="text-xl font-semibold text-midnight mb-4">Interview Scheduling</h3>
-              <p className="text-gray-600">Calendar integration and interview management features coming soon...</p>
+          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
+            <div className="elegant-card rounded-3xl p-12 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-warm-amber to-soft-lavender rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">📅</span>
+              </div>
+              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Interview Coordination</h3>
+              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Intelligent scheduling and interview management tools coming soon...</p>
             </div>
           </div>
         );
       case 'interview-summary':
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-              <h3 className="text-xl font-semibold text-midnight mb-4">Interview Summary Generator</h3>
-              <p className="text-gray-600">AI-powered interview analysis and summarization tools coming soon...</p>
+          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
+            <div className="elegant-card rounded-3xl p-12 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-soft-lavender to-charcoal-slate rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">🧠</span>
+              </div>
+              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Interview Intelligence</h3>
+              <p className="text-charcoal-slate/70 font-medium leading-relaxed">AI-powered interview analysis and intelligent summarization coming soon...</p>
             </div>
           </div>
         );
       case 'chat-summarizer':
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-              <h3 className="text-xl font-semibold text-midnight mb-4">Chat Summarizer</h3>
-              <p className="text-gray-600">Intelligent chat transcript analysis and data extraction coming soon...</p>
+          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
+            <div className="elegant-card rounded-3xl p-12 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-charcoal-slate to-rich-burgundy rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">💬</span>
+              </div>
+              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Chat Analytics</h3>
+              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Intelligent conversation analysis and insights extraction coming soon...</p>
             </div>
           </div>
         );
       case 'bias-detector':
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-              <h3 className="text-xl font-semibold text-midnight mb-4">Bias Detector</h3>
-              <p className="text-gray-600">AI-powered bias detection and fairness monitoring coming soon...</p>
+          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
+            <div className="elegant-card rounded-3xl p-12 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-rich-burgundy to-warm-amber rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">🛡️</span>
+              </div>
+              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Bias Detection</h3>
+              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Advanced fairness monitoring and bias detection algorithms coming soon...</p>
             </div>
           </div>
         );
       case 'analytics':
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-              <h3 className="text-xl font-semibold text-midnight mb-4">Analytics & Reports</h3>
-              <p className="text-gray-600">Comprehensive recruitment analytics and reporting dashboard coming soon...</p>
+          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
+            <div className="elegant-card rounded-3xl p-12 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-warm-amber to-rich-burgundy rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">📊</span>
+              </div>
+              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Advanced Analytics</h3>
+              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Comprehensive recruitment analytics and intelligent reporting coming soon...</p>
             </div>
           </div>
         );
       case 'settings':
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-              <h3 className="text-xl font-semibold text-midnight mb-4">Settings</h3>
-              <p className="text-gray-600">System configuration and user management settings coming soon...</p>
+          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
+            <div className="elegant-card rounded-3xl p-12 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-charcoal-slate to-soft-lavender rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-white">⚙️</span>
+              </div>
+              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">System Settings</h3>
+              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Platform configuration and advanced user management coming soon...</p>
             </div>
           </div>
         );
@@ -102,11 +123,11 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-pearl">
+    <div className="min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="transition-all duration-300">
         <Header title={getPageTitle()} />
-        <main className="ml-64">
+        <main className="ml-80">
           {renderContent()}
         </main>
       </div>
