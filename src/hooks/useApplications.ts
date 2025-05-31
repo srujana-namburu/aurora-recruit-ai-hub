@@ -1,7 +1,9 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+
+type ApplicationStatus = Database['public']['Enums']['application_status'];
 
 export const useApplications = () => {
   return useQuery({
@@ -73,7 +75,7 @@ export const useUpdateApplicationStatus = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status }: { id: string; status: ApplicationStatus }) => {
       console.log('Updating application status:', id, status);
       const { data, error } = await supabase
         .from('applications')
