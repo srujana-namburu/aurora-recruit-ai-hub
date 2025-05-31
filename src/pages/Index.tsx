@@ -5,6 +5,8 @@ import Header from '../components/Header';
 import Dashboard from '../components/Dashboard';
 import JobPostings from '../components/JobPostings';
 import ResumeMatcherAI from '../components/ResumeMatcherAI';
+import ApplicationsPipeline from '../components/ApplicationsPipeline';
+import CandidatesList from '../components/CandidatesList';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -34,29 +36,9 @@ const Index = () => {
       case 'resume-matcher':
         return <ResumeMatcherAI />;
       case 'candidates':
-        return (
-          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-rich-burgundy to-warm-amber rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">👥</span>
-              </div>
-              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Candidate Management</h3>
-              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Advanced candidate tracking and pipeline management features coming soon...</p>
-            </div>
-          </div>
-        );
+        return <ApplicationsPipeline />;
       case 'interviews':
-        return (
-          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-warm-amber to-soft-lavender rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">📅</span>
-              </div>
-              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Interview Coordination</h3>
-              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Intelligent scheduling and interview management tools coming soon...</p>
-            </div>
-          </div>
-        );
+        return <CandidatesList />;
       case 'interview-summary':
         return (
           <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
