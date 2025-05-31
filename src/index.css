@@ -82,6 +82,7 @@
     border: 1px solid rgba(229, 231, 235, 0.8);
     box-shadow: 0 20px 40px -12px rgba(153, 27, 27, 0.08);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: rgb(55, 65, 81); /* Ensure text is dark on light background */
   }
   
   .elegant-card:hover {
@@ -123,20 +124,22 @@
     backdrop-filter: blur(20px);
     border: 1px solid rgba(224, 231, 255, 0.4);
     box-shadow: 0 8px 32px 0 rgba(153, 27, 27, 0.05);
+    color: rgb(55, 65, 81); /* Ensure dark text on light background */
   }
   
   .lavender-highlight {
     background: linear-gradient(135deg, rgba(224, 231, 255, 0.3) 0%, rgba(224, 231, 255, 0.1) 100%);
     border: 1px solid rgba(224, 231, 255, 0.5);
+    color: rgb(55, 65, 81); /* Ensure dark text */
   }
   
   .elegant-scroll {
     scrollbar-width: thin;
-    scrollbar-color: rgba(153, 27, 27, 0.3) transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
   }
   
   .elegant-scroll::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
   
   .elegant-scroll::-webkit-scrollbar-track {
@@ -144,11 +147,36 @@
   }
   
   .elegant-scroll::-webkit-scrollbar-thumb {
-    background: rgba(153, 27, 27, 0.3);
-    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    transition: background 0.3s ease;
   }
   
   .elegant-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+  
+  /* Custom scrollbar for light backgrounds */
+  .light-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(153, 27, 27, 0.3) transparent;
+  }
+  
+  .light-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .light-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .light-scroll::-webkit-scrollbar-thumb {
+    background: rgba(153, 27, 27, 0.3);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  
+  .light-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(153, 27, 27, 0.5);
   }
   
@@ -261,6 +289,18 @@
   .border-soft-lavender {
     border-color: rgb(var(--soft-lavender));
   }
+}
+
+/* Ensure all text in cards and panels is visible */
+.elegant-card *,
+.glass-panel *,
+.lavender-highlight * {
+  color: rgb(55, 65, 81) !important;
+}
+
+/* Except for elements that should remain white (like in sidebar) */
+.elegant-gradient *:not(.text-white):not(.text-white\/70):not(.text-white\/80) {
+  color: white !important;
 }
 
 @keyframes smoothPulse {

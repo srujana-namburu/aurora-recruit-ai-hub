@@ -42,7 +42,7 @@ const Index = () => {
       case 'interview-summary':
         return (
           <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center">
+            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
               <div className="w-20 h-20 bg-gradient-to-br from-soft-lavender to-charcoal-slate rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">🧠</span>
               </div>
@@ -54,7 +54,7 @@ const Index = () => {
       case 'chat-summarizer':
         return (
           <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center">
+            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
               <div className="w-20 h-20 bg-gradient-to-br from-charcoal-slate to-rich-burgundy rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">💬</span>
               </div>
@@ -66,7 +66,7 @@ const Index = () => {
       case 'bias-detector':
         return (
           <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center">
+            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
               <div className="w-20 h-20 bg-gradient-to-br from-rich-burgundy to-warm-amber rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">🛡️</span>
               </div>
@@ -78,7 +78,7 @@ const Index = () => {
       case 'analytics':
         return (
           <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center">
+            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
               <div className="w-20 h-20 bg-gradient-to-br from-warm-amber to-rich-burgundy rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">📊</span>
               </div>
@@ -90,7 +90,7 @@ const Index = () => {
       case 'settings':
         return (
           <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center">
+            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
               <div className="w-20 h-20 bg-gradient-to-br from-charcoal-slate to-soft-lavender rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">⚙️</span>
               </div>
