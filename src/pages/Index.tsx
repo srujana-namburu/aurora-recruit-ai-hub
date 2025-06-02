@@ -4,9 +4,10 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import Dashboard from '../components/Dashboard';
 import JobPostings from '../components/JobPostings';
-import ResumeMatcherAI from '../components/ResumeMatcherAI';
+import BasicResumeMatcher from '../components/BasicResumeMatcher';
 import ApplicationsPipeline from '../components/ApplicationsPipeline';
 import CandidatesList from '../components/CandidatesList';
+import InterviewAI from '../components/InterviewAI';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -34,23 +35,13 @@ const Index = () => {
       case 'jobs':
         return <JobPostings />;
       case 'resume-matcher':
-        return <ResumeMatcherAI />;
+        return <BasicResumeMatcher />;
       case 'candidates':
         return <ApplicationsPipeline />;
       case 'interviews':
         return <CandidatesList />;
       case 'interview-summary':
-        return (
-          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
-              <div className="w-20 h-20 bg-gradient-to-br from-soft-lavender to-charcoal-slate rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">🧠</span>
-              </div>
-              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Interview Intelligence</h3>
-              <p className="text-charcoal-slate/70 font-medium leading-relaxed">AI-powered interview analysis and intelligent summarization coming soon...</p>
-            </div>
-          </div>
-        );
+        return <InterviewAI />;
       case 'chat-summarizer':
         return (
           <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
@@ -109,7 +100,7 @@ const Index = () => {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="transition-all duration-300">
         <Header title={getPageTitle()} />
-        <main className="ml-80">
+        <main className={`ml-80`}>
           {renderContent()}
         </main>
       </div>

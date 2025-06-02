@@ -116,6 +116,62 @@ export type Database = {
         }
         Relationships: []
       }
+      resume_analyses: {
+        Row: {
+          id: string
+          job_description: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          job_description: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          job_description?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      resume_results: {
+        Row: {
+          id: string
+          analysis_id: string
+          resume_name: string
+          score: number
+          content: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          analysis_id: string
+          resume_name: string
+          score: number
+          content?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          analysis_id?: string
+          resume_name?: string
+          score?: number
+          content?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_results_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "resume_analyses"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       applications: {
         Row: {
           ai_match_details: Json | null
@@ -931,7 +987,7 @@ export type Database = {
           },
         ]
       }
-      resume_analyses: {
+      resume_match_analyses: {
         Row: {
           ai_insights: Json | null
           candidate_id: string

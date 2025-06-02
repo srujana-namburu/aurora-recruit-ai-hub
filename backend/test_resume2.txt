@@ -1,0 +1,37 @@
+JOHN DOE
+Software Developer
+
+SUMMARY
+Experienced software developer with 5+ years of experience in Python and JavaScript development.
+Skilled in web development, data analysis, and machine learning.
+
+SKILLS
+- Programming Languages: Python, JavaScript, TypeScript, Java
+- Frameworks: React, Node.js, Express, Django, Flask
+- Databases: MongoDB, PostgreSQL, MySQL
+- Tools: Git, Docker, AWS, Azure
+
+EXPERIENCE
+Senior Software Developer
+ABC Tech, San Francisco, CA
+2020 - Present
+- Developed and maintained multiple web applications using React and Node.js
+- Implemented RESTful APIs using Express and MongoDB
+- Led a team of 3 junior developers on various projects
+
+Software Developer
+XYZ Solutions, San Jose, CA
+2018 - 2020
+- Built data processing pipelines using Python and PostgreSQL
+- Created dashboards and visualizations using D3.js and React
+- Collaborated with data scientists to implement machine learning models
+
+EDUCATION
+Bachelor of Science in Computer Science
+Stanford University, Stanford, CA
+2014 - 2018
+
+CERTIFICATIONS
+- AWS Certified Developer
+- MongoDB Certified Developer
+- React Certified Developer

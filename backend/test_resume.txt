@@ -1,0 +1,15 @@
+John Doe
+Software Engineer
+
+EXPERIENCE
+- Python Developer at ABC Corp (2020-Present)
+- Full Stack Developer at XYZ Inc (2018-2020)
+
+SKILLS
+- Python, JavaScript, React, Node.js
+- Machine Learning, Data Analysis
+- AWS, Docker, Kubernetes
+
+EDUCATION
+- Bachelor of Science in Computer Science
+- University of Technology (2014-2018)

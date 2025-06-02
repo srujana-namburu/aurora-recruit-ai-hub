@@ -1,248 +1,342 @@
 
-import React, { useState } from 'react';
-import { Upload, FileText, Star, TrendingUp, Zap, Download, Eye, Brain, Target, Award, Sparkles } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { FileText, Loader2, Brain, Sparkles } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
+
+interface Result {
+  name: string;
+  score: number;
+}
 
 const ResumeMatcherAI: React.FC = () => {
-  const [dragActive, setDragActive] = useState(false);
-  const [uploadedResumes, setUploadedResumes] = useState([
-    {
-      id: 1,
-      name: 'John_Doe_Resume.pdf',
-      score: 96,
-      skills: ['React', 'TypeScript', 'Node.js', 'AWS'],
-      experience: '5 years',
-      status: 'Exceptional Match',
-      aiInsights: 'Perfect technical alignment'
-    },
-    {
-      id: 2,
-      name: 'Sarah_Johnson_CV.pdf',
-      score: 89,
-      skills: ['Python', 'Django', 'PostgreSQL', 'Docker'],
-      experience: '4 years',
-      status: 'Strong Match',
-      aiInsights: 'Excellent backend expertise'
-    },
-    {
-      id: 3,
-      name: 'Mike_Wilson_Resume.pdf',
-      score: 76,
-      skills: ['Java', 'Spring', 'MySQL', 'Jenkins'],
-      experience: '3 years',
-      status: 'Good Match',
-      aiInsights: 'Solid foundation, room for growth'
-    }
-  ]);
+  const [jobDescription, setJobDescription] = useState('');
+  const [resumes, setResumes] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [results, setResults] = useState<Result[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
+  // Handle file upload
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const fileList = Array.from(e.target.files);
+      // Only accept PDF and TXT files
+      const validFiles = fileList.filter(file => 
+        file.type === 'application/pdf' || 
+        file.type === 'text/plain' || 
+        file.name.toLowerCase().endsWith('.pdf') || 
+        file.name.toLowerCase().endsWith('.txt')
+      );
+      
+      console.log(`Selected ${validFiles.length} files:`, validFiles.map(f => f.name));
+      
+      if (validFiles.length !== fileList.length) {
+        toast({
+          title: "Invalid file type",
+          description: "Only PDF and TXT files are accepted",
+          variant: "destructive"
+        });
+      }
+      
+      setResumes(validFiles);
     }
   };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
+  
+  // Remove a resume from the list
+  const removeResume = (index: number) => {
+    setResumes(prev => prev.filter((_, i) => i !== index));
   };
-
+  
+  // Convert cosine similarity to percentage
+  const similarityToPercentage = (similarity: number): number => {
+    // Convert similarity score (usually between -1 and 1) to percentage
+    const percentage = Math.round((similarity + 1) / 2 * 100);
+    return Math.min(Math.max(percentage, 0), 100); // Clamp between 0 and 100
+  };
+  
+  // Get color based on score
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-rich-burgundy bg-gradient-to-r from-rich-burgundy/10 to-warm-amber/10';
-    if (score >= 80) return 'text-warm-amber bg-gradient-to-r from-warm-amber/10 to-soft-lavender/10';
-    return 'text-charcoal-slate bg-soft-lavender/20';
+    if (score >= 80) return 'bg-green-100 text-green-800';
+    if (score >= 60) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-rose-100 text-rose-800';
   };
+  
+  // Analyze resumes using the backend API
+  const handleAnalyze = async () => {
+    if (!jobDescription.trim()) {
+      toast({
+        title: "Missing Job Description",
+        description: "Please enter a job description.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-  const getStatusColor = (status: string) => {
-    if (status === 'Exceptional Match') return 'bg-gradient-to-r from-rich-burgundy to-warm-amber';
-    if (status === 'Strong Match') return 'bg-gradient-to-r from-warm-amber to-soft-lavender';
-    return 'bg-gradient-to-r from-soft-lavender to-charcoal-slate';
+    if (resumes.length === 0) {
+      toast({
+        title: "No Resumes Selected",
+        description: "Please upload at least one resume.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Create form data
+      const formData = new FormData();
+      formData.append('job_description', jobDescription);
+      
+      // Append all resume files
+      console.log(`Sending ${resumes.length} resumes to backend:`, resumes.map(f => f.name));
+      resumes.forEach(file => {
+        formData.append('resumes', file);
+      });
+      
+      // Make API request to the backend server
+      console.log('Sending request to backend server...');
+      const response = await fetch('http://localhost:5002/rank-resumes', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      // Parse response
+      const data = await response.json();
+      
+      console.log('Raw API response:', data);
+      
+      if (data && data.results && Array.isArray(data.results)) {
+        // Force type conversion to ensure proper handling
+        const transformedResults: Result[] = [];
+        
+        // Process each result item individually
+        data.results.forEach((result: any) => {
+          console.log('Processing individual result:', result);
+          if (result && result.filename && typeof result.cosine_similarity === 'number') {
+            transformedResults.push({
+              name: result.filename,
+              score: Math.round(result.cosine_similarity * 100) // Convert to percentage
+            });
+          }
+        });
+        
+        // Sort results by score in descending order
+        const sortedResults = [...transformedResults].sort((a, b) => b.score - a.score);
+        
+        console.log('Final processed results:', sortedResults);
+        console.log('Number of results:', sortedResults.length);
+        
+        // Force a complete state refresh to ensure React updates the UI
+        setResults([]); // Clear first to ensure state update
+        // Use a more reliable approach to force state update
+        requestAnimationFrame(() => {
+          console.log('Setting results with length:', sortedResults.length);
+          setResults([...sortedResults]); // Create a completely new array
+        });
+        
+        if (sortedResults.length > 0) {
+          toast({
+            title: "Analysis Complete",
+            description: `Successfully analyzed ${sortedResults.length} resume(s)`,
+          });
+        } else {
+          toast({
+            title: "No Valid Results",
+            description: "No valid results could be generated from the analysis.",
+            variant: "destructive"
+          });
+        }
+      } else {
+        console.error('Invalid or empty results data:', data);
+        toast({
+          title: "No Results",
+          description: "No valid results were returned from the analysis.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error analyzing resumes:", error);
+      
+      setError("Failed to analyze resumes. Please try again.");
+      toast({
+        title: "Analysis Failed",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="p-8 space-y-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-      <div className="flex justify-between items-center animate-fade-in-up">
+    <div className="container mx-auto py-8 space-y-6">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-3xl font-bold text-elegant-gradient mb-2">Resume Matcher AI</h2>
-          <p className="text-charcoal-slate/70 font-medium tracking-wide">Precision matching with intelligent analysis</p>
+          <h2 className="text-3xl font-bold text-rose-700 mb-2">Resume Matcher AI</h2>
+          <p className="text-slate-600 font-medium">AI-powered resume analysis and matching</p>
         </div>
-        <div className="flex items-center space-x-3 lavender-highlight px-6 py-3 rounded-2xl">
-          <Brain className="h-5 w-5 text-rich-burgundy smooth-pulse" />
-          <span className="font-semibold text-rich-burgundy">AI Powered</span>
-          <Sparkles className="h-4 w-4 text-warm-amber gentle-float" />
-        </div>
-      </div>
-
-      {/* Elegant Upload Section */}
-      <div
-        className={`border-2 border-dashed rounded-3xl p-12 text-center transition-all duration-500 elegant-card ${
-          dragActive 
-            ? 'border-rich-burgundy bg-rich-burgundy/5 scale-102 shadow-2xl' 
-            : 'border-soft-lavender/50 hover:border-rich-burgundy/50 hover:bg-rich-burgundy/5'
-        }`}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
-      >
-        <div className="animate-scale-in">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-rich-burgundy to-warm-amber rounded-3xl flex items-center justify-center shadow-lg">
-            <Upload className="h-10 w-10 text-white gentle-float" />
-          </div>
-          <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Upload Resumes for AI Analysis</h3>
-          <p className="text-charcoal-slate/70 mb-8 text-lg leading-relaxed">Drop files here for intelligent matching, or browse to select</p>
-          <button className="minimalist-button px-10 py-4 rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl">
-            <span className="font-semibold">Choose Files</span>
-          </button>
-          <p className="text-sm text-charcoal-slate/60 mt-6 font-medium">Supports PDF, DOC, DOCX • Maximum 10MB per file</p>
+        <div className="flex items-center space-x-3 bg-rose-50 px-6 py-3 rounded-xl">
+          <Brain className="h-5 w-5 text-rose-700" />
+          <span className="font-semibold text-rose-700">AI Powered</span>
+          <Sparkles className="h-4 w-4 text-amber-500" />
         </div>
       </div>
-
-      {/* Elegant Analysis Results */}
-      <div className="elegant-card rounded-3xl p-8 animate-fade-in-up">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <h3 className="text-2xl font-bold text-charcoal-slate">AI Analysis Results</h3>
-            <Award className="h-6 w-6 text-warm-amber morph-icon" />
+      
+      <Card className="border-rose-100 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-rose-50 to-white">
+          <CardTitle className="text-rose-700">Resume Analyzer</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Job Description Input */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-slate-700">Job Description</h3>
+            <Textarea 
+              placeholder="Enter job description here..."
+              className="min-h-32 border-rose-200 focus:border-rose-500 focus:ring-rose-200 text-slate-800"
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              style={{ color: '#1e293b' }}
+            />
           </div>
-          <div className="flex items-center space-x-3 text-sm text-rich-burgundy font-semibold lavender-highlight px-4 py-2 rounded-2xl">
-            <TrendingUp className="h-4 w-4 smooth-pulse" />
-            <span>Ranked by AI Score</span>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          {uploadedResumes.map((resume, index) => (
-            <div
-              key={resume.id}
-              className="border border-soft-lavender/30 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 elegant-card animate-fade-in-up"
-              style={{ animationDelay: `${index * 0.15}s` }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-rich-burgundy to-warm-amber rounded-2xl flex items-center justify-center shadow-lg">
-                    <FileText className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-charcoal-slate text-lg">{resume.name}</h4>
-                    <p className="text-charcoal-slate/70 font-medium">{resume.experience} experience • {resume.aiInsights}</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-6">
-                  <div className={`px-6 py-3 rounded-2xl text-lg font-bold ${getScoreColor(resume.score)} shadow-lg`}>
-                    {resume.score}%
-                  </div>
-                  <div className="flex space-x-3">
-                    <button className="p-3 rounded-2xl hover:bg-soft-lavender/30 transition-all duration-300 hover:scale-110">
-                      <Eye size={18} className="text-charcoal-slate morph-icon" />
-                    </button>
-                    <button className="p-3 rounded-2xl hover:bg-soft-lavender/30 transition-all duration-300 hover:scale-110">
-                      <Download size={18} className="text-charcoal-slate morph-icon" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-semibold text-charcoal-slate tracking-wide">AI Match Score</span>
-                  <span className={`text-xs px-4 py-2 rounded-full text-white font-semibold ${getStatusColor(resume.status)}`}>
-                    {resume.status}
-                  </span>
-                </div>
-                <div className="w-full bg-soft-lavender/30 rounded-full h-4 relative overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-rich-burgundy to-warm-amber h-4 rounded-full transition-all duration-1000 ease-out relative elegant-shimmer"
-                    style={{ 
-                      width: `${resume.score}%`,
-                      animationDelay: `${index * 0.3}s`
-                    }}
-                  ></div>
-                </div>
-              </div>
-
-              <div>
-                <span className="text-sm font-semibold text-charcoal-slate mb-4 block tracking-wide">Key Skills Analysis</span>
-                <div className="flex flex-wrap gap-3">
-                  {resume.skills.map((skill, skillIndex) => (
-                    <span
-                      key={skillIndex}
-                      className="px-4 py-2 lavender-highlight text-rich-burgundy rounded-2xl text-sm font-semibold hover:scale-105 transition-all duration-300 animate-fade-in-up"
-                      style={{ animationDelay: `${(index * 0.1) + (skillIndex * 0.05)}s` }}
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
+          
+          {/* Resume Upload */}
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-2 text-slate-700">Upload Resumes</h3>
+            <div className="border-2 border-dashed border-rose-200 rounded-lg p-6 text-center bg-rose-50/30 hover:bg-rose-50 transition-colors">
+              <div className="flex flex-col items-center justify-center space-y-2">
+                <FileText className="h-8 w-8 text-rose-400" />
+                <p className="text-slate-600">Click to upload PDF or TXT files</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  accept=".pdf,.txt"
+                  multiple
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-rose-300 text-rose-700 hover:bg-rose-50 hover:text-rose-800"
+                >
+                  Select Files
+                </Button>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Elegant AI Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="elegant-gradient rounded-3xl p-8 text-white animate-scale-in">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold">Top Candidate</h3>
-            <Star className="h-7 w-7 gentle-float" />
           </div>
-          <p className="text-3xl font-bold mb-3">John Doe</p>
-          <p className="text-white/80 mb-4">96% AI match score</p>
-          <div className="flex items-center space-x-2">
-            <Target className="h-4 w-4" />
-            <span className="text-sm">Exceptional alignment</span>
-          </div>
-        </div>
-
-        <div className="elegant-card rounded-3xl p-8 animate-slide-in-right">
-          <h3 className="text-xl font-bold text-charcoal-slate mb-6">Skills Analysis</h3>
-          <div className="space-y-4">
-            {[
-              { skill: 'React', percentage: 95 },
-              { skill: 'TypeScript', percentage: 88 },
-              { skill: 'Node.js', percentage: 82 }
-            ].map((item, index) => (
-              <div key={item.skill} className="flex justify-between items-center">
-                <span className="text-sm text-charcoal-slate font-medium">{item.skill}</span>
-                <div className="flex items-center space-x-3">
-                  <div className="w-20 bg-soft-lavender/30 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-rich-burgundy to-warm-amber h-2 rounded-full transition-all duration-1000"
-                      style={{ width: `${item.percentage}%`, animationDelay: `${index * 0.2}s` }}
-                    ></div>
+          
+          {/* Uploaded Files List */}
+          {resumes.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2 text-slate-700">Uploaded Resumes</h3>
+              <div className="space-y-2">
+                {resumes.map((file, index) => (
+                  <div 
+                    key={index} 
+                    className="flex justify-between items-center p-3 bg-rose-50 rounded-lg border border-rose-100"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <FileText className="h-5 w-5 text-rose-500" />
+                      <span className="font-medium truncate max-w-xs text-slate-700">{file.name}</span>
+                      <span className="text-xs text-slate-500">{(file.size / 1024).toFixed(0)} KB</span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => removeResume(index)}
+                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-100"
+                    >
+                      Remove
+                    </Button>
                   </div>
-                  <span className="text-sm font-bold text-rich-burgundy min-w-[40px]">{item.percentage}%</span>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
+          )}
+          
+          {/* Analyze Button */}
+          <div className="flex justify-center mt-6">
+            <Button 
+              onClick={handleAnalyze}
+              disabled={isLoading || resumes.length === 0 || !jobDescription.trim()}
+              className="px-6 bg-rose-600 hover:bg-rose-700 text-white"
+            >
+              {isLoading ? (
+                <span className="flex items-center space-x-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Analyzing...</span>
+                </span>
+              ) : (
+                <span>Analyze Resumes</span>
+              )}
+            </Button>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        <div className="elegant-card rounded-3xl p-8 animate-fade-in-up">
-          <h3 className="text-xl font-bold text-charcoal-slate mb-6">AI Recommendations</h3>
-          <div className="space-y-4">
-            {[
-              { text: 'Schedule immediate interview with John Doe', priority: 'high', icon: Star },
-              { text: 'Consider Sarah for backend role assessment', priority: 'medium', icon: Target },
-              { text: 'Mike requires additional skill evaluation', priority: 'low', icon: Brain }
-            ].map((rec, index) => (
-              <div key={index} className="flex items-start space-x-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  rec.priority === 'high' ? 'bg-rich-burgundy' : 
-                  rec.priority === 'medium' ? 'bg-warm-amber' : 'bg-soft-lavender'
-                }`}>
-                  <rec.icon className="h-4 w-4 text-white" />
+
+
+      {/* Results Section */}
+      {/* Results Section */}
+      <Card className="mt-6 border-rose-100 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-rose-50 to-white">
+          <CardTitle className="text-rose-700">Analysis Results</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="text-center p-6 bg-rose-50 rounded-lg border border-rose-100">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-rose-500" />
+              <p className="mt-2 text-rose-700 font-medium">Analyzing resumes...</p>
+            </div>
+          ) : results && results.length > 0 ? (
+            <div className="space-y-4">
+              {results.map((result, index) => (
+                <div 
+                  key={index} 
+                  className="border border-rose-100 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center space-x-2">
+                      <FileText className="h-5 w-5 text-rose-500" />
+                      <h4 className="font-bold text-slate-700">{result.name}</h4>
+                    </div>
+                    <div className={`px-4 py-1.5 rounded-full font-bold ${getScoreColor(result.score)}`}>
+                      <span className="text-lg">{result.score}%</span> Match
+                    </div>
+                  </div>
+                  <Progress value={result.score} className="h-3 mt-2" />
                 </div>
-                <span className="text-sm text-charcoal-slate leading-relaxed font-medium">{rec.text}</span>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center p-6">
+              <p className="text-slate-600">No results to display. Upload resumes and analyze them to see results here.</p>
+              <div className="mt-4 p-4 bg-rose-50 rounded-lg border border-rose-200">
+                <h3 className="font-medium text-rose-700 mb-2">Troubleshooting</h3>
+                <ul className="list-disc pl-5 text-sm text-rose-800 space-y-1">
+                  <li>Make sure your resume is in PDF or TXT format</li>
+                  <li>Ensure the job description is detailed enough</li>
+                  <li>Try refreshing the page and uploading again</li>
+                </ul>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+              <pre className="mt-4 text-left text-xs text-gray-500 bg-gray-50 p-2 rounded overflow-auto">
+                {JSON.stringify({results}, null, 2)}
+              </pre>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
