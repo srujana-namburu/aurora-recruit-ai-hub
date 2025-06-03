@@ -59,11 +59,43 @@ export const useSubmitJobApplication = () => {
         throw new Error('You have already applied for this job');
       }
 
+      // First, create or find the candidate record for this user
+      let candidateId = user.id; // Use user ID as candidate ID for now
+      
+      // Check if candidate exists, if not create one
+      const { data: existingCandidate } = await supabase
+        .from('candidates')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (!existingCandidate) {
+        // Create candidate record using user metadata
+        const { data: candidateData, error: candidateError } = await supabase
+          .from('candidates')
+          .insert([{
+            id: user.id,
+            email: user.email || '',
+            first_name: user.user_metadata?.first_name || 'Unknown',
+            last_name: user.user_metadata?.last_name || 'User'
+          }])
+          .select()
+          .single();
+
+        if (candidateError) {
+          console.error('Error creating candidate:', candidateError);
+          throw candidateError;
+        }
+        
+        candidateId = candidateData.id;
+      }
+
       const { data, error } = await supabase
         .from('applications')
         .insert([{
           job_posting_id: jobPostingId,
           user_id: user.id,
+          candidate_id: candidateId,
           cover_letter: coverLetter,
           status: 'applied',
           applied_at: new Date().toISOString()

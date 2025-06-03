@@ -27,16 +27,19 @@ export const JobSeekerProfile = () => {
 
   useEffect(() => {
     if (profile) {
+      // Safely handle the skills field which comes as Json from the database
+      const profileSkills = Array.isArray(profile.skills) ? profile.skills as string[] : [];
+      
       setFormData({
         resume_url: profile.resume_url || '',
-        skills: profile.skills || [],
+        skills: profileSkills,
         experience_summary: profile.experience_summary || '',
         preferred_location: profile.preferred_location || '',
         preferred_salary_min: profile.preferred_salary_min?.toString() || '',
         preferred_salary_max: profile.preferred_salary_max?.toString() || '',
         availability_date: profile.availability_date || ''
       });
-      setSkillsInput((profile.skills || []).join(', '));
+      setSkillsInput(profileSkills.join(', '));
     }
   }, [profile]);
 
