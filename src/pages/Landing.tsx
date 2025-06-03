@@ -1,45 +1,21 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Building2, User, Briefcase, CheckCircle } from "lucide-react";
 
 const Landing = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let mounted = true;
+    // Simple timeout to simulate loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
 
-    const checkAuthStatus = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.log("Auth check error:", error);
-          setError(null); // Don't show auth errors on landing page
-        } else if (session?.user && mounted) {
-          navigate("/jobs", { replace: true });
-          return;
-        }
-      } catch (err) {
-        console.log("Auth check failed:", err);
-        setError(null); // Don't show errors on landing page
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    checkAuthStatus();
-    
-    return () => {
-      mounted = false;
-    };
-  }, [navigate]);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (loading) {
     return (

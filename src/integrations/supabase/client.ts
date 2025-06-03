@@ -14,7 +14,15 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   },
   realtime: {
     params: {
-      eventsPerSecond: 10,
+      eventsPerSecond: 2,
+    },
+  },
+  global: {
+    headers: {
+      'apikey': SUPABASE_PUBLISHABLE_KEY,
     },
   },
 });
+
+// Disable realtime for now to prevent connection issues
+supabase.realtime.disconnect();

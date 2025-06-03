@@ -20,6 +20,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    console.log('Error caught by boundary:', error);
     return { hasError: true, error };
   }
 
@@ -41,7 +42,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
             </CardHeader>
             <CardContent className="text-center">
               <Button 
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  this.setState({ hasError: false });
+                  window.location.reload();
+                }}
                 className="w-full"
               >
                 Refresh Page
