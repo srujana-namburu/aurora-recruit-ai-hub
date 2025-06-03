@@ -12,7 +12,25 @@ export default function JobSeeker() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (!session) {
+          navigate('/auth');
+        }
+      } catch (error) {
+        console.error('Auth error:', error);
+        navigate('/auth');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
@@ -24,17 +42,6 @@ export default function JobSeeker() {
         }
       }
     );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-      
-      if (!session) {
-        navigate('/auth');
-      }
-    });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
