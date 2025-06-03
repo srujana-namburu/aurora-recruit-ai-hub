@@ -116,62 +116,6 @@ export type Database = {
         }
         Relationships: []
       }
-      resume_analyses: {
-        Row: {
-          id: string
-          job_description: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          job_description: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          job_description?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      resume_results: {
-        Row: {
-          id: string
-          analysis_id: string
-          resume_name: string
-          score: number
-          content: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          analysis_id: string
-          resume_name: string
-          score: number
-          content?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          analysis_id?: string
-          resume_name?: string
-          score?: number
-          content?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "resume_results_analysis_id_fkey"
-            columns: ["analysis_id"]
-            isOneToOne: false
-            referencedRelation: "resume_analyses"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       applications: {
         Row: {
           ai_match_details: Json | null
@@ -840,12 +784,62 @@ export type Database = {
           },
         ]
       }
+      job_applications: {
+        Row: {
+          applicant_id: string | null
+          cover_letter: string | null
+          created_at: string | null
+          id: string
+          job_id: string | null
+          resume_url: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          applicant_id?: string | null
+          cover_letter?: string | null
+          created_at?: string | null
+          id?: string
+          job_id?: string | null
+          resume_url: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          applicant_id?: string | null
+          cover_letter?: string | null
+          created_at?: string | null
+          id?: string
+          job_id?: string | null
+          resume_url?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_postings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_postings: {
         Row: {
           application_count: number | null
+          application_deadline: string | null
           company_id: string
           created_at: string
           created_by: string
+          department: string | null
           description: string
           employment_type: Database["public"]["Enums"]["employment_type"] | null
           experience_level:
@@ -854,9 +848,12 @@ export type Database = {
           expires_at: string | null
           id: string
           job_description_file_url: string | null
+          job_type: string | null
           location: string | null
+          posting_date: string | null
           qualifications: Json | null
           remote_allowed: boolean | null
+          remote_policy: string | null
           requirements: Json | null
           responsibilities: Json | null
           salary_range_max: number | null
@@ -868,9 +865,11 @@ export type Database = {
         }
         Insert: {
           application_count?: number | null
+          application_deadline?: string | null
           company_id: string
           created_at?: string
           created_by: string
+          department?: string | null
           description: string
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
@@ -881,9 +880,12 @@ export type Database = {
           expires_at?: string | null
           id?: string
           job_description_file_url?: string | null
+          job_type?: string | null
           location?: string | null
+          posting_date?: string | null
           qualifications?: Json | null
           remote_allowed?: boolean | null
+          remote_policy?: string | null
           requirements?: Json | null
           responsibilities?: Json | null
           salary_range_max?: number | null
@@ -895,9 +897,11 @@ export type Database = {
         }
         Update: {
           application_count?: number | null
+          application_deadline?: string | null
           company_id?: string
           created_at?: string
           created_by?: string
+          department?: string | null
           description?: string
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
@@ -908,9 +912,12 @@ export type Database = {
           expires_at?: string | null
           id?: string
           job_description_file_url?: string | null
+          job_type?: string | null
           location?: string | null
+          posting_date?: string | null
           qualifications?: Json | null
           remote_allowed?: boolean | null
+          remote_policy?: string | null
           requirements?: Json | null
           responsibilities?: Json | null
           salary_range_max?: number | null
@@ -920,22 +927,7 @@ export type Database = {
           updated_at?: string
           views_count?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "job_postings_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "job_postings_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -987,7 +979,31 @@ export type Database = {
           },
         ]
       }
-      resume_match_analyses: {
+      profiles: {
+        Row: {
+          company_id: string | null
+          created_at: string | null
+          id: number
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string | null
+          id?: never
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string | null
+          id?: never
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      resume_analyses: {
         Row: {
           ai_insights: Json | null
           candidate_id: string
@@ -1056,6 +1072,41 @@ export type Database = {
           },
         ]
       }
+      resume_results: {
+        Row: {
+          analysis_id: string | null
+          content: string | null
+          created_at: string | null
+          id: string
+          resume_name: string
+          score: number
+        }
+        Insert: {
+          analysis_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          resume_name: string
+          score: number
+        }
+        Update: {
+          analysis_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          resume_name?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_results_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "resume_analyses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           company_id: string
@@ -1069,7 +1120,9 @@ export type Database = {
           last_name: string
           password_hash: string
           phone: string | null
+          profile_complete: boolean | null
           profile_image_url: string | null
+          profile_picture_url: string | null
           reset_token: string | null
           reset_token_expires: string | null
           role: Database["public"]["Enums"]["user_role"]
@@ -1087,10 +1140,12 @@ export type Database = {
           last_name: string
           password_hash: string
           phone?: string | null
+          profile_complete?: boolean | null
           profile_image_url?: string | null
+          profile_picture_url?: string | null
           reset_token?: string | null
           reset_token_expires?: string | null
-          role: Database["public"]["Enums"]["user_role"]
+          role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
         }
         Update: {
@@ -1105,7 +1160,9 @@ export type Database = {
           last_name?: string
           password_hash?: string
           phone?: string | null
+          profile_complete?: boolean | null
           profile_image_url?: string | null
+          profile_picture_url?: string | null
           reset_token?: string | null
           reset_token_expires?: string | null
           role?: Database["public"]["Enums"]["user_role"]
@@ -1126,13 +1183,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_interview_feedback_table: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      create_resume_analyses_tables: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_current_user_company_id: {
         Args: Record<PropertyKey, never>
         Returns: string
-      }
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: Database["public"]["Enums"]["user_role"]
       }
       is_admin: {
         Args: Record<PropertyKey, never>
@@ -1210,7 +1271,7 @@ export type Database = {
         | "offer_letter"
         | "feedback_request"
       transcript_source: "recruiter_call" | "candidate_chat" | "screening_call"
-      user_role: "admin" | "recruiter" | "interviewer" | "hiring_manager"
+      user_role: "hr" | "job_seeker"
       visa_status:
         | "citizen"
         | "permanent_resident"
@@ -1407,7 +1468,7 @@ export const Constants = {
         "feedback_request",
       ],
       transcript_source: ["recruiter_call", "candidate_chat", "screening_call"],
-      user_role: ["admin", "recruiter", "interviewer", "hiring_manager"],
+      user_role: ["hr", "job_seeker"],
       visa_status: [
         "citizen",
         "permanent_resident",
