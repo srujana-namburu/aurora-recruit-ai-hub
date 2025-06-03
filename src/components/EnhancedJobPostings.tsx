@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import type { Database } from '@/integrations/supabase/types';
+
+type ApplicationStatus = Database['public']['Enums']['application_status'];
 
 type JobPosting = {
   id: string;
@@ -29,7 +32,7 @@ type Application = {
   id: string;
   candidate_id: string;
   job_posting_id: string;
-  status: string;
+  status: ApplicationStatus;
   applied_at: string;
   cover_letter?: string;
   candidate?: {
@@ -128,7 +131,7 @@ const EnhancedJobPostings: React.FC = () => {
     }
   };
 
-  const updateApplicationStatus = async (applicationId: string, newStatus: string) => {
+  const updateApplicationStatus = async (applicationId: string, newStatus: ApplicationStatus) => {
     try {
       const { error } = await supabase
         .from('applications')
@@ -160,7 +163,7 @@ const EnhancedJobPostings: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: ApplicationStatus) => {
     switch (status) {
       case 'applied': return 'bg-blue-100 text-blue-800';
       case 'screening': return 'bg-yellow-100 text-yellow-800';
@@ -174,9 +177,10 @@ const EnhancedJobPostings: React.FC = () => {
     }
   };
 
-  const statusOptions = [
+  const statusOptions: ApplicationStatus[] = [
     'applied', 'screening', 'phone_screen', 'technical_interview', 
-    'final_interview', 'offer_sent', 'hired', 'rejected'
+    'final_interview', 'offer_sent', 'offer_accepted', 'offer_declined', 
+    'hired', 'rejected', 'withdrawn'
   ];
 
   if (loading) {
@@ -327,7 +331,7 @@ const EnhancedJobPostings: React.FC = () => {
                             <div className="ml-4 space-y-2">
                               <select
                                 value={application.status}
-                                onChange={(e) => updateApplicationStatus(application.id, e.target.value)}
+                                onChange={(e) => updateApplicationStatus(application.id, e.target.value as ApplicationStatus)}
                                 className="text-sm border rounded px-2 py-1"
                               >
                                 {statusOptions.map(status => (
