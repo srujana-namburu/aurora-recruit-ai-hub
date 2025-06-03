@@ -1,111 +1,220 @@
 
-import React, { useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import Dashboard from '../components/Dashboard';
-import JobPostings from '../components/JobPostings';
-import BasicResumeMatcher from '../components/BasicResumeMatcher';
-import ApplicationsPipeline from '../components/ApplicationsPipeline';
-import CandidatesList from '../components/CandidatesList';
-import InterviewAI from '../components/InterviewAI';
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Briefcase, Users, FileText, TrendingUp, Plus, Search, Calendar, Settings } from 'lucide-react';
+import EnhancedJobPostings from '@/components/EnhancedJobPostings';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
-const Index = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+export default function Index() {
+  const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
 
-  const getPageTitle = () => {
-    switch (activeTab) {
-      case 'dashboard': return 'Dashboard Overview';
-      case 'jobs': return 'Job Management';
-      case 'candidates': return 'Candidate Pipeline';
-      case 'interviews': return 'Interview Coordination';
-      case 'resume-matcher': return 'Resume Matcher AI';
-      case 'interview-summary': return 'Interview Intelligence';
-      case 'chat-summarizer': return 'Chat Analytics';
-      case 'bias-detector': return 'Bias Detection';
-      case 'analytics': return 'Advanced Analytics';
-      case 'settings': return 'System Settings';
-      default: return 'ElegantATS Platform';
-    }
-  };
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'jobs':
-        return <JobPostings />;
-      case 'resume-matcher':
-        return <BasicResumeMatcher />;
-      case 'candidates':
-        return <ApplicationsPipeline />;
-      case 'interviews':
-        return <CandidatesList />;
-      case 'interview-summary':
-        return <InterviewAI />;
-      case 'chat-summarizer':
-        return (
-          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
-              <div className="w-20 h-20 bg-gradient-to-br from-charcoal-slate to-rich-burgundy rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">💬</span>
-              </div>
-              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Chat Analytics</h3>
-              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Intelligent conversation analysis and insights extraction coming soon...</p>
-            </div>
-          </div>
-        );
-      case 'bias-detector':
-        return (
-          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
-              <div className="w-20 h-20 bg-gradient-to-br from-rich-burgundy to-warm-amber rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">🛡️</span>
-              </div>
-              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Bias Detection</h3>
-              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Advanced fairness monitoring and bias detection algorithms coming soon...</p>
-            </div>
-          </div>
-        );
-      case 'analytics':
-        return (
-          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
-              <div className="w-20 h-20 bg-gradient-to-br from-warm-amber to-rich-burgundy rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">📊</span>
-              </div>
-              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">Advanced Analytics</h3>
-              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Comprehensive recruitment analytics and intelligent reporting coming soon...</p>
-            </div>
-          </div>
-        );
-      case 'settings':
-        return (
-          <div className="p-8 min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-            <div className="elegant-card rounded-3xl p-12 text-center border border-charcoal-slate/10 bg-white/95">
-              <div className="w-20 h-20 bg-gradient-to-br from-charcoal-slate to-soft-lavender rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">⚙️</span>
-              </div>
-              <h3 className="text-2xl font-bold text-charcoal-slate mb-4">System Settings</h3>
-              <p className="text-charcoal-slate/70 font-medium leading-relaxed">Platform configuration and advanced user management coming soon...</p>
-            </div>
-          </div>
-        );
-      default:
-        return <Dashboard />;
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pearl-white to-soft-lavender/20">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <div className="transition-all duration-300">
-        <Header title={getPageTitle()} />
-        <main className={`ml-80`}>
-          {renderContent()}
-        </main>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center">
+                <Briefcase className="h-8 w-8 text-blue-600" />
+                <span className="ml-2 text-xl font-bold text-gray-900">TalentHub</span>
+              </div>
+              <Badge variant="secondary">HR Dashboard</Badge>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="jobs" className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4" />
+              Job Postings
+            </TabsTrigger>
+            <TabsTrigger value="candidates" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Candidates
+            </TabsTrigger>
+            <TabsTrigger value="interviews" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Interviews
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Jobs</CardTitle>
+                  <Briefcase className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">12</div>
+                  <p className="text-xs text-muted-foreground">
+                    +2 from last month
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">284</div>
+                  <p className="text-xs text-muted-foreground">
+                    +18% from last month
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Candidates in Pipeline</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">48</div>
+                  <p className="text-xs text-muted-foreground">
+                    +5 this week
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Interviews Scheduled</CardTitle>
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">8</div>
+                  <p className="text-xs text-muted-foreground">
+                    This week
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Applications</CardTitle>
+                  <CardDescription>Latest candidate applications</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <p className="font-medium">John Doe</p>
+                          <p className="text-sm text-gray-600">Senior Developer</p>
+                        </div>
+                        <Badge>New</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Upcoming Interviews</CardTitle>
+                  <CardDescription>Scheduled interviews this week</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <p className="font-medium">Jane Smith</p>
+                          <p className="text-sm text-gray-600">Tomorrow at 2:00 PM</p>
+                        </div>
+                        <Badge variant="outline">Technical</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="jobs">
+            <EnhancedJobPostings />
+          </TabsContent>
+
+          <TabsContent value="candidates" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Candidate Management</h2>
+              <div className="flex gap-2">
+                <Button variant="outline">
+                  <Search className="h-4 w-4 mr-2" />
+                  Search Candidates
+                </Button>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Candidate
+                </Button>
+              </div>
+            </div>
+            
+            <Card>
+              <CardContent className="text-center py-12">
+                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Candidate Database</h3>
+                <p className="text-gray-500">Manage all your candidates from one central location.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="interviews" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Interview Management</h2>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Schedule Interview
+              </Button>
+            </div>
+            
+            <Card>
+              <CardContent className="text-center py-12">
+                <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Interview Scheduler</h3>
+                <p className="text-gray-500">Schedule and manage interviews with candidates.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
-};
-
-export default Index;
+}

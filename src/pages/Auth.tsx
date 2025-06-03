@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,40 +20,102 @@ const Auth = () => {
   const [role, setRole] = useState<"hr" | "job_seeker">("job_seeker");
   const [companyName, setCompanyName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        // Set up auth state listener first
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (event, session) => {
+            console.log('Auth page auth state changed:', event, session?.user?.id);
+            if (mounted) {
+              setSession(session);
+              setUser(session?.user ?? null);
+              setInitializing(false);
+              
+              if (session?.user) {
+                // Redirect based on user role or default to jobs page
+                const userRole = session.user.user_metadata?.role;
+                if (userRole === 'hr') {
+                  navigate("/dashboard");
+                } else {
+                  navigate("/jobs");
+                }
+              }
+            }
+          }
+        );
+
+        // Then check for existing session
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (session?.user) {
-          // Redirect based on user role or default to jobs page
-          navigate("/jobs");
+        if (error) {
+          console.error('Auth page session error:', error);
+        }
+        
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setInitializing(false);
+          
+          if (session?.user) {
+            const userRole = session.user.user_metadata?.role;
+            if (userRole === 'hr') {
+              navigate("/dashboard");
+            } else {
+              navigate("/jobs");
+            }
+          }
+        }
+
+        return () => {
+          subscription.unsubscribe();
+          mounted = false;
+        };
+      } catch (err) {
+        console.error('Auth page initialization error:', err);
+        if (mounted) {
+          setInitializing(false);
         }
       }
-    );
+    };
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        navigate("/jobs");
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    const cleanup = initializeAuth();
+    
+    return () => {
+      mounted = false;
+      cleanup?.then(cleanupFn => cleanupFn?.());
+    };
   }, [navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password || !firstName || !lastName) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (role === 'hr' && !companyName) {
+      toast({
+        title: "Error",
+        description: "Company name is required for HR accounts.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -73,21 +136,35 @@ const Auth = () => {
       });
 
       if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
+        if (error.message.includes('already registered')) {
+          toast({
+            title: "Account exists",
+            description: "This email is already registered. Please sign in instead.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
       } else {
         toast({
           title: "Success",
-          description: "Please check your email to confirm your account.",
+          description: "Account created successfully! Please check your email to confirm your account.",
         });
+        // Clear form
+        setEmail("");
+        setPassword("");
+        setFirstName("");
+        setLastName("");
+        setCompanyName("");
       }
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -97,6 +174,16 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Error",
+        description: "Please enter both email and password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -106,16 +193,25 @@ const Auth = () => {
       });
 
       if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
+        if (error.message.includes('Invalid login credentials')) {
+          toast({
+            title: "Invalid credentials",
+            description: "Please check your email and password and try again.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
       }
+      // Success handling is done in the auth state change listener
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -123,10 +219,24 @@ const Auth = () => {
     }
   };
 
+  if (initializing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (user) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Redirecting...</p>
+        </div>
       </div>
     );
   }
@@ -162,6 +272,7 @@ const Auth = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="Enter your email"
                   />
                 </div>
                 <div>
@@ -173,6 +284,7 @@ const Auth = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="Enter your password"
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
@@ -192,6 +304,7 @@ const Auth = () => {
                       onChange={(e) => setFirstName(e.target.value)}
                       required
                       className="mt-1"
+                      placeholder="First name"
                     />
                   </div>
                   <div>
@@ -202,6 +315,7 @@ const Auth = () => {
                       onChange={(e) => setLastName(e.target.value)}
                       required
                       className="mt-1"
+                      placeholder="Last name"
                     />
                   </div>
                 </div>
@@ -215,6 +329,7 @@ const Auth = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="Enter your email"
                   />
                 </div>
                 
@@ -227,6 +342,8 @@ const Auth = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     className="mt-1"
+                    placeholder="Create a password"
+                    minLength={6}
                   />
                 </div>
                 

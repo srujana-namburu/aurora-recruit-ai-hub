@@ -8,30 +8,46 @@ import { Building2, User, Briefcase, CheckCircle } from "lucide-react";
 const Landing = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkAuth = async () => {
+    let mounted = true;
+
+    const checkAuthStatus = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          navigate("/jobs");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.log("Auth check error:", error);
+          setError(null); // Don't show auth errors on landing page
+        } else if (session?.user && mounted) {
+          navigate("/jobs", { replace: true });
           return;
         }
-      } catch (error) {
-        console.log("Auth check error:", error);
+      } catch (err) {
+        console.log("Auth check failed:", err);
+        setError(null); // Don't show errors on landing page
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
-    checkAuth();
+    checkAuthStatus();
+    
+    return () => {
+      mounted = false;
+    };
   }, [navigate]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading TalentHub...</p>
+        </div>
       </div>
     );
   }
