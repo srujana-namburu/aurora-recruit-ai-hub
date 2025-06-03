@@ -132,6 +132,7 @@ export type Database = {
           stage_changed_by: string | null
           status: Database["public"]["Enums"]["application_status"] | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           ai_match_details?: Json | null
@@ -148,6 +149,7 @@ export type Database = {
           stage_changed_by?: string | null
           status?: Database["public"]["Enums"]["application_status"] | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           ai_match_details?: Json | null
@@ -164,6 +166,7 @@ export type Database = {
           stage_changed_by?: string | null
           status?: Database["public"]["Enums"]["application_status"] | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -190,6 +193,13 @@ export type Database = {
           {
             foreignKeyName: "applications_stage_changed_by_fkey"
             columns: ["stage_changed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -928,6 +938,56 @@ export type Database = {
           views_count?: number | null
         }
         Relationships: []
+      }
+      job_seeker_profiles: {
+        Row: {
+          availability_date: string | null
+          created_at: string | null
+          experience_summary: string | null
+          id: string
+          preferred_location: string | null
+          preferred_salary_max: number | null
+          preferred_salary_min: number | null
+          resume_url: string | null
+          skills: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          availability_date?: string | null
+          created_at?: string | null
+          experience_summary?: string | null
+          id?: string
+          preferred_location?: string | null
+          preferred_salary_max?: number | null
+          preferred_salary_min?: number | null
+          resume_url?: string | null
+          skills?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          availability_date?: string | null
+          created_at?: string | null
+          experience_summary?: string | null
+          id?: string
+          preferred_location?: string | null
+          preferred_salary_max?: number | null
+          preferred_salary_min?: number | null
+          resume_url?: string | null
+          skills?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_seeker_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
